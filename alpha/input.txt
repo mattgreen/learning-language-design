@@ -1,6 +1,11 @@
-print "Hello"
+# This is a comment
+# print "Shouldn't see this"
 
+print "Hello"
 print "Several words"
 print "Last line"
+
+# Blank strings should work
 print ""
-print "I am Matt"
+
+# Comment on last line

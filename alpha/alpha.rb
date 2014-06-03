@@ -14,6 +14,9 @@ class Lexer
         tokens << [:PRINT, $1]
         i += print_statement.length
 
+      elsif comment = chunk[/\A#.*/]
+        i += chunk.index("\n")
+
       elsif chunk[0] == "\n"
         line += 1
         i += 1
