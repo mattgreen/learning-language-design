@@ -74,5 +74,74 @@ class Interpreter
   end
 end
 
-Interpreter.new.evaluate(File.read(ARGV[0]))
+# Simple bytecode format used by the compiler and the VM
+#
+# Opcode        Operands        Stack before    Stack after
+# ---------------------------------------------------------
+PUSH_STR = 0  # String to push  []              [str]
+PRINT = 1     #                 [str]           []
+RETURN = 2    #
 
+class Compiler
+  def initialize
+    @bytecode = []
+  end
+
+  def compile(code)
+    nodes = Parser.new.parse(code)
+
+    nodes.each do |node|
+      method = "compile" + node.class.name.gsub(/([A-Z])/) { "_#{$1.downcase}" }
+
+      __send__(method, node)
+    end
+
+    emit(RETURN)
+
+    @bytecode
+  end
+
+  def compile_print_node(node)
+    emit(PUSH_STR, node.str)
+    emit(PRINT)
+  end
+
+  def emit(opcode, *operands)
+    @bytecode << opcode
+    @bytecode.concat(operands)
+  end
+end
+
+class VM
+  def execute(bytecode)
+    ip = 0
+    stack = []
+
+    loop do
+      opcode = bytecode[ip]
+      ip += 1
+
+      case opcode
+      when PUSH_STR
+        stack.push(bytecode[ip])
+        ip += 1
+
+      when PRINT
+        s = stack.pop
+
+        print s + "\n"
+
+      when RETURN
+        break
+
+      else
+        raise "Unexpected opcode #{opcode}"
+
+      end
+    end
+  end
+end
+
+code = File.read(ARGV[0])
+#Interpreter.new.evaluate(File.read(ARGV[0]))
+VM.new.execute(Compiler.new.compile(code))
