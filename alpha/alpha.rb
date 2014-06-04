@@ -15,7 +15,7 @@ class Lexer
         i += print_statement.length
 
       elsif comment = chunk[/\A#.*/]
-        i += chunk.index("\n")
+        i += chunk.index("\n") || comment.length
 
       elsif chunk[0] == "\n"
         line += 1
