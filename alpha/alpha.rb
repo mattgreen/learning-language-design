@@ -22,7 +22,7 @@ class Lexer
         i += 1
 
       else
-        raise "Unexpected input on line #{line}: \"#{chunk[0..chunk.index("\n")-1]}\""
+        raise "Syntax error on line #{line}: \"#{chunk[0..chunk.index("\n")-1]}\""
 
       end
     end
@@ -38,12 +38,13 @@ end
 # Converts token stream produced by lexer into AST nodes
 class Parser
   def initialize
-    @nodes = []
+    @lexer = Lexer.new
   end
 
-  def parse(tokens)
+  def parse(code)
     nodes = []
 
+    tokens = @lexer.lex(code)
     tokens.each do |token|
       if token[0] == :PRINT
         nodes << PrintNode.new(token[1])
@@ -58,7 +59,9 @@ end
 
 # Walks the specified AST, executing it
 class Interpreter
-  def evaluate(nodes)
+  def evaluate(code)
+    nodes = Parser.new.parse(code)
+
     nodes.each do |node|
       method = "evaluate" + node.class.name.gsub(/([A-Z])/) { "_#{$1.downcase}" }
 
@@ -71,7 +74,5 @@ class Interpreter
   end
 end
 
-tokens = Lexer.new.lex(File.read(ARGV[0]))
-nodes = Parser.new.parse(tokens)
-Interpreter.new.evaluate(nodes)
+Interpreter.new.evaluate(File.read(ARGV[0]))
 
