@@ -1,0 +1,7 @@
+42
+18
+"hello"
+"my name is matt"
+true
+false
+1; 2; "three expressions on one line"

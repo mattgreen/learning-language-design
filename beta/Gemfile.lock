@@ -1,0 +1,10 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    racc (1.4.11)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  racc
