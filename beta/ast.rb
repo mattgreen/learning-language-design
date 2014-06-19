@@ -27,10 +27,17 @@ class FalseNode < LiteralNode
   end
 end
 
-class IfNode < Struct.new(:condition, :body)
+class OpNode < Struct.new(:left, :right)
 end
 
-class AddNode < Struct.new(:left, :right)
+class AddNode < OpNode
 end
 
+class SubNode < OpNode
+end
 
+class MulNode < OpNode
+end
+
+class DivNode < OpNode
+end

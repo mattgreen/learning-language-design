@@ -5,6 +5,11 @@ token STRING
 token NEWLINE
 token TRUE FALSE
 
+prechigh
+  left '*' '/'
+  left '+' '-'
+preclow
+
 rule
   Program:
                   { result = AST.new([]) }
@@ -20,7 +25,8 @@ rule
 
   Expression:
     Literal
-  | '(' Expression ')'    { result = val[1] }
+  | Operator
+  | '(' Expression ')'        { result = val[1] }
   ;
 
   Literal:
@@ -28,6 +34,13 @@ rule
   | STRING    { result = StringNode.new(val[0]) }
   | TRUE      { result = TrueNode.new }
   | FALSE     { result = FalseNode.new }
+  ;
+
+  Operator:
+    Expression '+' Expression { result = AddNode.new(val[0], val[2]) }
+  | Expression '-' Expression { result = SubNode.new(val[0], val[2]) }
+  | Expression '*' Expression { result = MulNode.new(val[0], val[2]) }
+  | Expression '/' Expression { result = DivNode.new(val[0], val[2]) }
   ;
 
   Terminator:
