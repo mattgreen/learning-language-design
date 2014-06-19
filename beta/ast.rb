@@ -27,6 +27,9 @@ class FalseNode < LiteralNode
   end
 end
 
+class CallNode < Struct.new(:name, :args)
+end
+
 class OpNode < Struct.new(:left, :right)
 end
 

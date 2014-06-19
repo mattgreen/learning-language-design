@@ -19,19 +19,27 @@ class Interpreter
   end
 
   def evaluate_add(node)
-    p evaluate_node(node.left) + evaluate_node(node.right)
+    evaluate_node(node.left) + evaluate_node(node.right)
   end
 
   def evaluate_sub(node)
-    p evaluate_node(node.left) - evaluate_node(node.right)
+    evaluate_node(node.left) - evaluate_node(node.right)
   end
 
   def evaluate_mul(node)
-    p evaluate_node(node.left) * evaluate_node(node.right)
+    evaluate_node(node.left) * evaluate_node(node.right)
   end
 
   def evaluate_div(node)
-    p evaluate_node(node.left) / evaluate_node(node.right)
+    evaluate_node(node.left) / evaluate_node(node.right)
+  end
+
+  def evaluate_call(node)
+    if node.name == "print"
+      puts evaluate_node(node.args[0])
+    else
+      raise "unknown function: #{node.name}"
+    end
   end
 end
 

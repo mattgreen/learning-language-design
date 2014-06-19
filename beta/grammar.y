@@ -4,6 +4,7 @@ token NUMBER
 token STRING
 token NEWLINE
 token TRUE FALSE
+token IDENTIFIER
 
 prechigh
   left '*' '/'
@@ -26,6 +27,7 @@ rule
   Expression:
     Literal
   | Operator
+  | Call
   | '(' Expression ')'        { result = val[1] }
   ;
 
@@ -41,6 +43,10 @@ rule
   | Expression '-' Expression { result = SubNode.new(val[0], val[2]) }
   | Expression '*' Expression { result = MulNode.new(val[0], val[2]) }
   | Expression '/' Expression { result = DivNode.new(val[0], val[2]) }
+  ;
+
+  Call:
+    IDENTIFIER '(' Expression ')'     { result = CallNode.new(val[0], [val[2]]) }
   ;
 
   Terminator:
