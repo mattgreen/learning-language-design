@@ -1,6 +1,10 @@
 require_relative 'parser'
 
 class Interpreter
+  def initialize
+    @locals = {}
+  end
+
   def evaluate(code)
     ast = Parser.new.parse(code)
 
@@ -40,6 +44,14 @@ class Interpreter
     else
       raise "unknown function: #{node.name}"
     end
+  end
+
+  def evaluate_get_local(node)
+    @locals[node.name] or raise "undefined variable '#{node.name}'"
+  end
+
+  def evaluate_set_local(node)
+    @locals[node.name] = evaluate_node(node.value)
   end
 end
 

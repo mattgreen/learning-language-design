@@ -28,6 +28,8 @@ rule
     Literal
   | Operator
   | Call
+  | GetLocal
+  | SetLocal
   | '(' Expression ')'        { result = val[1] }
   ;
 
@@ -47,6 +49,14 @@ rule
 
   Call:
     IDENTIFIER '(' Expression ')'     { result = CallNode.new(val[0], [val[2]]) }
+  ;
+
+  GetLocal:
+    IDENTIFIER                        { result = GetLocalNode.new(val[0]) }
+  ;
+
+  SetLocal:
+    IDENTIFIER '=' Expression         { result = SetLocalNode.new(val[0], val[2]) }
   ;
 
   Terminator:

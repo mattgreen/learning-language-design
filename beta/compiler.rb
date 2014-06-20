@@ -62,8 +62,17 @@ class Compiler
   def visit_call(node)
     visit(node.args.first)
 
-
     emit(:call, node.name)
+  end
+
+  def visit_get_local(node)
+    emit(:get_local, node.name)
+  end
+
+  def visit_set_local(node)
+    visit(node.value)
+
+    emit(:set_local, node.name)
   end
 end
 

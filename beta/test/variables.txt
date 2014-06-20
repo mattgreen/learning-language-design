@@ -1,0 +1,8 @@
+a = 5 + 1
+b = "hey"
+print(a)
+
+a = 1
+print(a)
+
+print(b)

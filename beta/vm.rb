@@ -4,6 +4,7 @@ class VM
   def execute(bytecode)
     ip = 0
     stack = []
+    locals = {}
 
     loop do
       opcode = bytecode[ip]
@@ -44,6 +45,19 @@ class VM
         else
           raise "unknown function: #{name}"
         end
+
+      when :get_local
+        name = bytecode[ip]
+        ip += 1
+        val = locals[name] or raise "undefined variable '#{name}'"
+
+        stack.push(val)
+
+      when :set_local
+        name = bytecode[ip]
+        ip += 1
+
+        locals[name] = stack.pop
 
       when :return
         break

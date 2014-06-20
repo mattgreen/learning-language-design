@@ -44,3 +44,9 @@ end
 
 class DivNode < OpNode
 end
+
+class GetLocalNode < Struct.new(:name)
+end
+
+class SetLocalNode < Struct.new(:name, :value)
+end
