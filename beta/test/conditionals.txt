@@ -1,0 +1,8 @@
+a = 4
+
+if a == 4
+  print("a is 4")
+  print("a is true")
+else
+  print("a is false")
+end

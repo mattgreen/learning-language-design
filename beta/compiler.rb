@@ -1,6 +1,9 @@
 require 'pp'
 require_relative 'parser'
 
+class Instruction < Struct.new(:opcode, :operands)
+end
+
 class Compiler
   def initialize
     @bytecode = []
@@ -18,8 +21,10 @@ class Compiler
   private
 
   def emit(op, *operands)
-    @bytecode << op
-    @bytecode.concat(operands)
+    inst = Instruction.new(op, operands)
+    @bytecode << inst
+
+    inst
   end
 
   def visit(node)
@@ -59,6 +64,14 @@ class Compiler
     visit_op(node) { emit(:div) }
   end
 
+  def visit_eq(node)
+    visit_op(node) { emit(:eq) }
+  end
+
+  def visit_not_eq(node)
+    visit_op(node) { emit(:not_eq) }
+  end
+
   def visit_call(node)
     visit(node.args.first)
 
@@ -73,6 +86,21 @@ class Compiler
     visit(node.value)
 
     emit(:set_local, node.name)
+  end
+
+  def visit_if(node)
+    visit(node.condition)
+
+    branch = emit(:if, 0, 0)
+
+    branch.operands[0] = @bytecode.length
+    node.if_block.each { |n| visit(n) }
+    jump = emit(:jump, 0)
+
+    branch.operands[1] = @bytecode.length
+    node.else_block.each { |n| visit(n) }
+
+    jump.operands[0] = @bytecode.length
   end
 end
 

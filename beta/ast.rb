@@ -45,8 +45,17 @@ end
 class DivNode < OpNode
 end
 
+class EqNode < OpNode
+end
+
+class NotEqNode < OpNode
+end
+
 class GetLocalNode < Struct.new(:name)
 end
 
 class SetLocalNode < Struct.new(:name, :value)
+end
+
+class IfNode < Struct.new(:condition, :if_block, :else_block)
 end

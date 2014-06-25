@@ -38,6 +38,14 @@ class Interpreter
     evaluate_node(node.left) / evaluate_node(node.right)
   end
 
+  def evaluate_eq(node)
+    evaluate_node(node.left) == evaluate_node(node.right)
+  end
+
+  def evaluate_not_eq(node)
+    evaluate_node(node.left) != evaluate_node(node.right)
+  end
+
   def evaluate_call(node)
     if node.name == "print"
       puts evaluate_node(node.args[0])
@@ -52,6 +60,17 @@ class Interpreter
 
   def evaluate_set_local(node)
     @locals[node.name] = evaluate_node(node.value)
+  end
+
+  def evaluate_if(node)
+    if evaluate_node(node.condition) == false
+      node.else_block.each { |n| evaluate_node(n) }
+    else
+      node.if_block.each { |n| evaluate_node(n) }
+    end
+
+
+
   end
 end
 

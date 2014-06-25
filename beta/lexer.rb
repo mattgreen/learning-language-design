@@ -1,5 +1,5 @@
 class Lexer
-  KEYWORDS = ["true", "false"]
+  KEYWORDS = ["if", "else", "end", "true", "false"]
 
   def tokenize(code)
     code.chomp!
@@ -27,10 +27,14 @@ class Lexer
         tokens << [:STRING, string]
         i += string.length + 2
 
-      elsif chunk.match(/\A /)
+      elsif operator = chunk[/\A(==|!=)/, 1]
+        tokens << [operator, operator]
+        i += operator.length
+
+      elsif chunk[0] == " "
         i += 1
 
-      elsif chunk.match(/\A\n/)
+      elsif chunk[0] == "\n"
         tokens << [:NEWLINE, "\n"]
         i += 1
 

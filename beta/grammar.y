@@ -5,6 +5,7 @@ token STRING
 token NEWLINE
 token TRUE FALSE
 token IDENTIFIER
+token IF ELSE END
 
 prechigh
   left '*' '/'
@@ -14,22 +15,27 @@ preclow
 rule
   Program:
                   { result = AST.new([]) }
-  | Expressions   { result = val[0] }
+  | Statements    { result = AST.new(val[0]) }
   ;
 
-  Expressions:
-    Expression  { result = AST.new(val) }
-  | Expressions Terminator Expression { result = val[0] << val[2] }
-  | Expressions Terminator { result = val[0] }
-  | Terminator  { result = AST.new([]) }
+  Statements:
+    Statement                       { result = val }
+  | Statements Terminator Statement { result = val[0] << val[2] }
+  | Statements Terminator           { result = val[0] }
+  | Terminator Statements           { result = val[1] }
+  | Terminator                      { result = [] }
   ;
+
+  Statement:
+    Expression
+  | If
+  | Call
+  | SetLocal
 
   Expression:
     Literal
   | Operator
-  | Call
   | GetLocal
-  | SetLocal
   | '(' Expression ')'        { result = val[1] }
   ;
 
@@ -41,10 +47,12 @@ rule
   ;
 
   Operator:
-    Expression '+' Expression { result = AddNode.new(val[0], val[2]) }
-  | Expression '-' Expression { result = SubNode.new(val[0], val[2]) }
-  | Expression '*' Expression { result = MulNode.new(val[0], val[2]) }
-  | Expression '/' Expression { result = DivNode.new(val[0], val[2]) }
+    Expression '+'  Expression { result = AddNode.new(val[0], val[2]) }
+  | Expression '-'  Expression { result = SubNode.new(val[0], val[2]) }
+  | Expression '*'  Expression { result = MulNode.new(val[0], val[2]) }
+  | Expression '/'  Expression { result = DivNode.new(val[0], val[2]) }
+  | Expression '==' Expression { result = EqNode.new(val[0], val[2]) }
+  | Expression '!=' Expression { result = NotEqNode.new(val[0], val[2]) }
   ;
 
   Call:
@@ -56,7 +64,12 @@ rule
   ;
 
   SetLocal:
-    IDENTIFIER '=' Expression         { result = SetLocalNode.new(val[0], val[2]) }
+    IDENTIFIER '=' Expression           { result = SetLocalNode.new(val[0], val[2]) }
+  ;
+
+  If:
+    IF Expression Statements END                    { result = IfNode.new(val[1], val[2], []) }
+  | IF Expression Statements ELSE Statements END    { result = IfNode.new(val[1], val[2], val[4]) }
   ;
 
   Terminator:
