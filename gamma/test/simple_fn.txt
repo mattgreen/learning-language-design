@@ -1,0 +1,10 @@
+def test(arg)
+  if arg == 42
+    print("Arg was 42")
+  else
+    print("Arg was not 42")
+  end
+end
+
+test(42)
+test(43)
