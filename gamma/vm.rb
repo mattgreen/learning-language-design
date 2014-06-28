@@ -3,8 +3,11 @@ require_relative 'compiler'
 class VM
   def execute(bytecode)
     ip = 0
+    functions = {}
     stack = []
-    locals = {}
+    frames = [{}]
+    locals = frames.first
+    return_ips = []
 
     loop do
       instruction = bytecode[ip]
@@ -22,6 +25,37 @@ class VM
       when :set_local
         name = instruction.operands[0]
         locals[name] = stack.pop
+
+      when :fn_begin
+        name = instruction.operands[0]
+        functions[name] = ip
+
+        while bytecode[ip].opcode != :fn_end
+          ip += 1
+        end
+
+        ip += 1
+
+      when :frame_setup
+        return_ips.push(stack.pop)
+
+        arg_names = instruction.operands[0].dup
+
+        args = {}
+        arg_count = stack.pop
+        while ! arg_names.empty?
+          arg_name = arg_names.pop
+          args[arg_name] = stack.pop
+        end
+
+        frames.push(args)
+        locals = frames.last
+
+      when :frame_teardown
+        frames.pop
+        locals = frames.last
+
+        ip = return_ips.pop
 
       when :eq
         right = stack.pop
@@ -102,14 +136,17 @@ class VM
       when :call
         name = instruction.operands[0]
 
-        args = []
-        arg_count = stack.pop
-        arg_count.times { args << stack.pop }
-
         if name == "print"
+          args = []
+          arg_count = stack.pop
+          arg_count.times { args << stack.pop }
+
           puts args[0]
+        elsif fn_ip = functions[name]
+          stack.push(ip)
+          ip = fn_ip
         else
-          raise "unknown function "#{name}"
+          raise "unknown function '#{name}'"
         end
 
       when :end

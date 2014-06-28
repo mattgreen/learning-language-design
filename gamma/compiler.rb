@@ -3,23 +3,45 @@ require_relative 'parser'
 class Compiler
   def initialize
     @bytecode = []
-    @functions = {}
+    @functions = []
 
     @in_loop = false
     @breaks = []
+
+    @in_function = false
+    @returns = []
   end
 
   def compile(code)
     ast = Parser.new.parse(code)
-
     ast.nodes.each { |n| visit(n) }
     emit(:end)
 
-    @functions.each do |node|
+    program = @bytecode
 
+    @functions.each do |node|
+      @bytecode = []
+
+      emit(:fn_begin, node.name)
+      emit(:frame_setup, node.args)
+
+      @in_function = true
+      node.body.each { |n| visit(n) }
+      @in_function = false
+
+      teardown_ip = @bytecode.length
+      emit(:frame_teardown)
+      emit(:fn_end)
+
+      @returns.each do |ret|
+        ret.operands[0] = teardown_ip - ret.ip - 1
+      end
+      @returns.clear
+
+      program = @bytecode + program
     end
 
-    @bytecode
+    program
   end
 
   private
@@ -168,6 +190,13 @@ class Compiler
     raise "can't break outside of a loop" unless @in_loop
 
     @breaks << emit(:reljump, 0)
+  end
+
+  def visit_return(node)
+    raise "can't return outside of function" unless @in_function
+
+    visit(node.value)
+    @returns << emit(:reljump, 0)
   end
 
   def offset(to)
