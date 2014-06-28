@@ -1,0 +1,9 @@
+a = 10
+
+while a > 0
+    print(a)
+    if a == 4
+        break
+    end
+    a = a - 1
+end

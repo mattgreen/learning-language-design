@@ -8,6 +8,8 @@ token IDENTIFIER
 token IF ELSE END
 token DEF
 token RETURN
+token WHILE
+token BREAK
 
 prechigh
   right '!'
@@ -40,6 +42,8 @@ rule
   | If
   | SetLocal
   | Function
+  | While
+  | Break
   | Return
   ;
 
@@ -115,6 +119,14 @@ rule
   Return:
     RETURN              { result = ReturnNode.new(nil) }
   | RETURN Expression   { result = ReturnNode.new(val[1]) }
+
+  While:
+    WHILE Expression Statements END    { result = WhileNode.new(val[1], val[2]) }
+  ;
+
+  Break:
+    BREAK { result = BreakNode.new }
+  ;
 
   Terminator:
     NEWLINE

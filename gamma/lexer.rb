@@ -1,5 +1,5 @@
 class Lexer
-  KEYWORDS = ["def", "if", "else", "end", "true", "false", "return"]
+  KEYWORDS = ["def", "if", "else", "end", "true", "false", "return", "while", "break"]
 
   def tokenize(code)
     code.chomp!

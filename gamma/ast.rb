@@ -81,8 +81,14 @@ end
 class IfNode < Struct.new(:condition, :if_block, :else_block)
 end
 
+class WhileNode < Struct.new(:condition, :block)
+end
+
 class DefNode < Struct.new(:name, :args, :body)
 end
 
 class ReturnNode < Struct.new(:value)
+end
+
+class BreakNode
 end

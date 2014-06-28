@@ -8,6 +8,7 @@ class Interpreter
     @builtins = {}
 
     @returning = false
+    @breaking = false
 
     @builtins["print"] = ->(args) { puts args[0] }
   end
@@ -147,6 +148,18 @@ class Interpreter
 
     @returning = true
     evaluate_node(node.value)
+  end
+
+  def evaluate_while(node)
+    while evaluate_node(node.condition) != false && ! @returning && ! @breaking
+      evaluate_nodes(node.block)
+    end
+  end
+
+  def evaluate_break(node)
+    @breaking = true
+
+    nil
   end
 
   def locals
