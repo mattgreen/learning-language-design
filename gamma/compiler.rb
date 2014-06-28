@@ -25,7 +25,7 @@ class Compiler
   private
 
   def emit(opcode, *operands)
-    inst = Instruction.new(opcode, operands)
+    inst = Instruction.new(@bytecode.length, opcode, operands)
     @bytecode << inst
 
     inst
@@ -128,35 +128,37 @@ class Compiler
   def visit_if(node)
     visit(node.condition)
 
-    branch = emit(:cjump, 0, 0)
+    branch = emit(:creljump, 0, 0)
+    branch_ip = @bytecode.length
 
-    branch.operands[0] = @bytecode.length
     node.if_block.each { |n| visit(n) }
-    jump = emit(:jump, 0)
 
-    branch.operands[1] = @bytecode.length
+    jump = emit(:reljump, 0)
+    jump_ip = @bytecode.length
+
+    branch.operands[1] = offset(branch_ip)
     node.else_block.each { |n| visit(n) }
 
-    jump.operands[0] = @bytecode.length
+    jump.operands[0] = offset(jump_ip)
   end
 
   def visit_while(node)
-    condition = @bytecode.length
+    condition_ip = @bytecode.length
     visit(node.condition)
 
-    branch = emit(:cjump, 0, 0)
-    branch.operands[0] = @bytecode.length
+    branch = emit(:creljump, 0, 0)
+    loop_end = @bytecode.length
 
     @in_loop = true
     node.block.each { |n| visit(n) }
     @in_loop = false
 
-    emit(:jump, condition)
+    emit(:reljump, condition_ip - @bytecode.length - 1)
 
-    branch.operands[1] = @bytecode.length
+    branch.operands[1] = offset(loop_end)
 
     @breaks.each do |jump|
-      jump.operands[0] = @bytecode.length
+      jump.operands[0] = jump.ip - loop_end - 1
     end
 
     @breaks.clear
@@ -165,11 +167,15 @@ class Compiler
   def visit_break(node)
     raise "can't break outside of a loop" unless @in_loop
 
-    @breaks << emit(:jump, 0)
+    @breaks << emit(:reljump, 0)
+  end
+
+  def offset(to)
+    @bytecode.length - to
   end
 end
 
-class Instruction < Struct.new(:opcode, :operands)
+class Instruction < Struct.new(:ip, :opcode, :operands)
 end
 
 if $0 == __FILE__

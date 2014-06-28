@@ -87,17 +87,17 @@ class VM
         left = stack.pop
         stack.push(left / right)
 
-      when :cjump
+      when :creljump
         condition = stack.pop
 
         if condition == false
-          ip = instruction.operands[1]
+          ip += instruction.operands[1]
         else
-          ip = instruction.operands[0]
+          ip += instruction.operands[0]
         end
 
-      when :jump
-        ip = instruction.operands[0]
+      when :reljump
+        ip += instruction.operands[0]
 
       when :call
         name = instruction.operands[0]
