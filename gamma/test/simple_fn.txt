@@ -6,5 +6,26 @@ def test(arg)
   end
 end
 
-test(42)
+def test2()
+  "test"
+end
+
+def greet(age)
+  if age == 32
+    print("You are as old as Matt!")
+    return "wow"
+  end
+
+  if age == 42
+    print("Wow, you are old")
+    true
+  else
+    print("You are not so old after all")
+    false
+  end
+end
+
+print(greet(22))
+print(greet(32))
+print(test2())
 test(43)

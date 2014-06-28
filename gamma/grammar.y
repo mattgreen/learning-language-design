@@ -7,11 +7,16 @@ token TRUE FALSE
 token IDENTIFIER
 token IF ELSE END
 token DEF
+token RETURN
 
 prechigh
+  right '!'
   left '*' '/'
   left '+' '-'
+  left '>' '>=' '<' '<='
   left '==' '!='
+  left '&&'
+  left '||'
   right '='
   left ','
 preclow
@@ -33,14 +38,15 @@ rule
   Statement:
     Expression
   | If
-  | Call
   | SetLocal
   | Function
+  | Return
   ;
 
   Expression:
     Literal
   | Operator
+  | Call
   | GetLocal
   | '(' Expression ')'        { result = val[1] }
   ;
@@ -57,8 +63,15 @@ rule
   | Expression '-'  Expression { result = SubNode.new(val[0], val[2]) }
   | Expression '*'  Expression { result = MulNode.new(val[0], val[2]) }
   | Expression '/'  Expression { result = DivNode.new(val[0], val[2]) }
+  | Expression '<'  Expression { result = LessThanNode.new(val[0], val[2]) }
+  | Expression '<=' Expression { result = LessThanEqNode.new(val[0], val[2]) }
+  | Expression '>'  Expression { result = GreaterThanNode.new(val[0], val[2]) }
+  | Expression '>=' Expression { result = GreaterThanEqNode.new(val[0], val[2]) }
   | Expression '==' Expression { result = EqNode.new(val[0], val[2]) }
   | Expression '!=' Expression { result = NotEqNode.new(val[0], val[2]) }
+  | Expression '&&' Expression { result = AndNode.new(val[0], val[2]) }
+  | Expression '||' Expression { result = OrNode.new(val[0], val[2]) }
+  | '!' Expression             { result = NotNode.new(val[1]) }
   ;
 
   Call:
@@ -90,7 +103,8 @@ rule
   ;
 
   Function:
-    DEF IDENTIFIER '(' Params ')' Statements END  { result = DefNode.new(val[1], val[3], val[5]) }
+    DEF IDENTIFIER '(' ')' Statements END         { result = DefNode.new(val[1], [], val[4]) }
+  | DEF IDENTIFIER '(' Params ')' Statements END  { result = DefNode.new(val[1], val[3], val[5]) }
   ;
 
   Params:
@@ -98,12 +112,17 @@ rule
   | Params ',' IDENTIFIER             { result = val[0] << val[2] }
   ;
 
+  Return:
+    RETURN              { result = ReturnNode.new(nil) }
+  | RETURN Expression   { result = ReturnNode.new(val[1]) }
+
   Terminator:
     NEWLINE
   | ";"
   ;
 
 ---- header
+require 'pp'
 require_relative 'lexer'
 require_relative 'ast'
 
@@ -120,5 +139,5 @@ end
 
 ---- footer
 if __FILE__ == $0
-  puts Parser.new.parse(File.read(ARGV[0])).inspect
+  pp Parser.new.parse(File.read(ARGV[0]))
 end

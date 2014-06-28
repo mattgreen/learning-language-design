@@ -51,6 +51,27 @@ end
 class NotEqNode < OpNode
 end
 
+class LessThanNode < OpNode
+end
+
+class LessThanEqNode < OpNode
+end
+
+class GreaterThanNode < OpNode
+end
+
+class GreaterThanEqNode < OpNode
+end
+
+class AndNode < OpNode
+end
+
+class OrNode < OpNode
+end
+
+class NotNode < Struct.new(:op)
+end
+
 class GetLocalNode < Struct.new(:name)
 end
 
@@ -61,4 +82,7 @@ class IfNode < Struct.new(:condition, :if_block, :else_block)
 end
 
 class DefNode < Struct.new(:name, :args, :body)
+end
+
+class ReturnNode < Struct.new(:value)
 end

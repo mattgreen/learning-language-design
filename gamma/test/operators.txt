@@ -1,0 +1,22 @@
+a = 4
+b = 6
+
+if a >= 4
+    print("a is greater than or equal to 4")
+end
+
+if a <= 4
+    print("a is less than or equal to 4")
+end
+
+if a == 1 || a == 2
+    print("shouldn't see this")
+end
+
+if a == 4 && b == 6
+  print("a is 4 and b is 6")
+end
+
+if ! (a == 5 && b == 7)
+  print("Convoluted test is false")
+end

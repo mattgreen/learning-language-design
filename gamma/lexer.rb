@@ -1,5 +1,5 @@
 class Lexer
-  KEYWORDS = ["def", "if", "else", "end", "true", "false"]
+  KEYWORDS = ["def", "if", "else", "end", "true", "false", "return"]
 
   def tokenize(code)
     code.chomp!
@@ -27,7 +27,7 @@ class Lexer
         tokens << [:STRING, string]
         i += string.length + 2
 
-      elsif operator = chunk[/\A(==|!=)/, 1]
+      elsif operator = chunk[/\A(==|!=|>=|<=|\|\||&&)/, 1]
         tokens << [operator, operator]
         i += operator.length
 
@@ -50,5 +50,6 @@ class Lexer
 end
 
 if __FILE__ == $0
-  puts Lexer.new.tokenize(File.read(ARGV[0])).inspect
+  require 'pp'
+  pp Lexer.new.tokenize(File.read(ARGV[0]))
 end
